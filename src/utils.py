@@ -59,7 +59,7 @@ def get_month(dat):
         return dat
 
 
-def get_month_by_case(case):
+def get_month_from_case(case):
     months = [None,"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     res=re.findall(r"\.\d{2}\.\d{2}", case)
     if res:
@@ -68,12 +68,44 @@ def get_month_by_case(case):
         return months[int(re.findall(r"\d{4}\.\d{2}", case)[0][5:])]
     else:
         return case
-    
+
+
+
+def get_season(dat):
+    res=re.search(r"^Summer", dat)
+    if res:
+        return res[0]
+    else:
+        return dat
+
 
 def mean_attacks(month_number, fatal):
-    result = [0]*12
+    n = month_number.value_counts().count()
+    result = [0]*n
     for i,_ in enumerate(month_number):
-        for j in range(12):
+        for j in range(n):
             if j+1 == month_number[i]:
                 result[j] += fatal[i]
+    return result
+
+
+def combine_list(lst1, lst2):
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Summer"]
+    return [lst2[i] if lst1[i] != lst2[i] and \
+            lst1[i] not in months and \
+            lst2[i] in months \
+            else lst1[i] for i,_ in enumerate(lst1)]
+
+def mean_attacks_hemisphere(season, fatal):
+    n = season.value_counts().count()
+    result = [0]*n
+    for i,e in enumerate(season):
+        if "Fall" == season[i]:
+            result[0] += fatal[i]
+        elif "Spring" == season[i]:
+            result[1] += fatal[i]
+        elif "Summer" == season[i]:
+            result[2] += fatal[i]
+        elif "Winter" == season[i]:
+            result[3] += fatal[i]
     return result
